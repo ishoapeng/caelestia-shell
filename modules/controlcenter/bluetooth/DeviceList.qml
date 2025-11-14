@@ -279,6 +279,115 @@ ColumnLayout {
         }
     }
 
+    // Battery section for connected devices
+    Loader {
+        Layout.fillWidth: true
+        Layout.topMargin: Appearance.spacing.normal
+        active: connectedDevicesWithBattery.length > 0
+        visible: active
+
+        sourceComponent: ColumnLayout {
+            spacing: Appearance.spacing.small
+
+            StyledText {
+                text: qsTr("Battery")
+                font.pointSize: Appearance.font.size.larger
+                font.weight: 500
+            }
+
+            StyledText {
+                text: qsTr("Battery levels of connected devices")
+                color: Colours.palette.m3outline
+            }
+
+            Repeater {
+                model: ScriptModel {
+                    values: connectedDevicesWithBattery
+                }
+
+                BatteryItem {
+                    required property BluetoothDevice modelData
+                    device: modelData
+                }
+            }
+        }
+    }
+
+    readonly property var connectedDevicesWithBattery: Bluetooth.devices.values.filter(d => d.connected && d.batteryAvailable)
+
+    component BatteryItem: StyledRect {
+        required property BluetoothDevice device
+
+        Layout.fillWidth: true
+        implicitHeight: batteryContent.implicitHeight + Appearance.padding.large * 2
+
+        radius: Appearance.rounding.normal
+        color: Colours.tPalette.m3surfaceContainer
+
+        ColumnLayout {
+            id: batteryContent
+
+            anchors.fill: parent
+            anchors.margins: Appearance.padding.large
+            spacing: Appearance.spacing.smaller
+
+            RowLayout {
+                Layout.fillWidth: true
+
+                MaterialIcon {
+                    text: "battery_std"
+                    color: Colours.palette.m3primary
+                    font.pointSize: Appearance.font.size.large
+                }
+
+                StyledText {
+                    Layout.fillWidth: true
+                    text: device.name
+                    font.pointSize: Appearance.font.size.normal
+                    font.weight: 500
+                    elide: Text.ElideRight
+                }
+
+                StyledText {
+                    text: `${Math.round(device.battery * 100)}%`
+                    color: Colours.palette.m3onSurfaceVariant
+                    font.pointSize: Appearance.font.size.normal
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Appearance.padding.smaller
+                spacing: Appearance.spacing.small / 2
+
+                StyledRect {
+                    Layout.fillHeight: true
+                    implicitWidth: device.batteryAvailable ? parent.width * device.battery : 0
+                    radius: Appearance.rounding.full
+                    color: Colours.palette.m3primary
+                }
+
+                StyledRect {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    radius: Appearance.rounding.full
+                    color: Colours.palette.m3secondaryContainer
+
+                    StyledRect {
+                        anchors.right: parent.right
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.margins: parent.height * 0.25
+
+                        implicitWidth: height
+                        radius: Appearance.rounding.full
+                        color: Colours.palette.m3primary
+                    }
+                }
+            }
+        }
+    }
+
     component ToggleButton: StyledRect {
         id: toggleBtn
 
