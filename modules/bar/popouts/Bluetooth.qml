@@ -94,11 +94,24 @@ ColumnLayout {
                 text: Icons.getBluetoothIcon(device.modelData.icon)
             }
 
-            StyledText {
+            ColumnLayout {
                 Layout.leftMargin: Appearance.spacing.small / 2
                 Layout.rightMargin: Appearance.spacing.small / 2
                 Layout.fillWidth: true
-                text: device.modelData.name
+                spacing: 0
+
+                StyledText {
+                    Layout.fillWidth: true
+                    text: device.modelData.name
+                }
+
+                StyledText {
+                    Layout.fillWidth: true
+                    visible: device.modelData.connected && device.modelData.batteryAvailable
+                    text: qsTr("%1% battery").arg(Math.round(device.modelData.battery * 100))
+                    color: Colours.palette.m3onSurfaceVariant
+                    font.pointSize: Appearance.font.size.small
+                }
             }
 
             StyledRect {
