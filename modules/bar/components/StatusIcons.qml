@@ -145,10 +145,26 @@ StyledRect {
             name: "network"
             active: Config.bar.status.showNetwork
 
-            sourceComponent: MaterialIcon {
-                animate: true
-                text: Network.active ? Icons.getNetworkIcon(Network.active.strength ?? 0) : "wifi_off"
-                color: root.colour
+            sourceComponent: ColumnLayout {
+                spacing: 0
+
+                MaterialIcon {
+                    Layout.alignment: Qt.AlignHCenter
+                    animate: true
+                    text: Network.active ? Icons.getNetworkIcon(Network.active.strength ?? 0) : "wifi_off"
+                    color: root.colour
+                }
+
+                StyledText {
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.maximumWidth: Config.bar.sizes.innerWidth - Appearance.padding.smaller * 2
+                    visible: Network.active?.ssid && Network.active.ssid.length > 0
+                    text: Network.active?.ssid ?? ""
+                    color: root.colour
+                    font.pointSize: Appearance.font.size.smaller * 0.75
+                    elide: Text.ElideMiddle
+                    horizontalAlignment: Text.AlignHCenter
+                }
             }
         }
 
