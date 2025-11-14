@@ -19,8 +19,10 @@ ColumnLayout {
     readonly property int currMonth: currentDate.getMonth()
     readonly property int currYear: currentDate.getFullYear()
 
+
     StyledText {
         Layout.topMargin: Appearance.padding.normal
+        Layout.leftMargin: Appearance.padding.small
         Layout.rightMargin: Appearance.padding.small
         text: qsTr("Calendar")
         font.weight: 500
@@ -30,6 +32,7 @@ ColumnLayout {
         id: monthNavigationRow
 
         Layout.fillWidth: true
+        Layout.leftMargin: Appearance.padding.small
         Layout.rightMargin: Appearance.padding.small
         spacing: Appearance.spacing.small
 
@@ -123,6 +126,7 @@ ColumnLayout {
         id: daysRow
 
         Layout.fillWidth: true
+        Layout.leftMargin: Appearance.padding.small
         Layout.rightMargin: Appearance.padding.small
         locale: grid.locale
 
@@ -138,8 +142,17 @@ ColumnLayout {
 
     Item {
         Layout.fillWidth: true
+        Layout.leftMargin: Appearance.padding.small
         Layout.rightMargin: Appearance.padding.small
-        implicitHeight: grid.implicitHeight
+        Layout.bottomMargin: Appearance.padding.normal
+        implicitHeight: Math.max(grid.implicitHeight, gridMinHeight)
+
+        readonly property real gridMinHeight: {
+            // Estimate minimum height: 6 rows * (text height + padding)
+            const dayHeight = Appearance.font.size.normal + Appearance.padding.small * 2;
+            return dayHeight * 6 + spacing * 5;
+        }
+        readonly property real spacing: 3
 
         MonthGrid {
             id: grid
