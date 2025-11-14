@@ -181,33 +181,50 @@ StyledRect {
                         values: Bluetooth.devices.values.filter(d => d.state !== BluetoothDeviceState.Disconnected)
                     }
 
-                    MaterialIcon {
-                        id: device
+                    ColumnLayout {
+                        id: deviceContainer
 
                         required property BluetoothDevice modelData
+                        readonly property BluetoothDevice device: modelData
 
-                        animate: true
-                        text: Icons.getBluetoothIcon(modelData?.icon)
-                        color: root.colour
-                        fill: 1
+                        spacing: 0
 
-                        SequentialAnimation on opacity {
-                            running: device.modelData?.state !== BluetoothDeviceState.Connected
-                            alwaysRunToEnd: true
-                            loops: Animation.Infinite
+                        MaterialIcon {
+                            id: deviceIcon
 
-                            Anim {
-                                from: 1
-                                to: 0
-                                duration: Appearance.anim.durations.large
-                                easing.bezierCurve: Appearance.anim.curves.standardAccel
+                            Layout.alignment: Qt.AlignHCenter
+                            animate: true
+                            text: Icons.getBluetoothIcon(deviceContainer.device?.icon)
+                            color: root.colour
+                            fill: 1
+
+                            SequentialAnimation on opacity {
+                                running: deviceContainer.device?.state !== BluetoothDeviceState.Connected
+                                alwaysRunToEnd: true
+                                loops: Animation.Infinite
+
+                                Anim {
+                                    from: 1
+                                    to: 0
+                                    duration: Appearance.anim.durations.large
+                                    easing.bezierCurve: Appearance.anim.curves.standardAccel
+                                }
+                                Anim {
+                                    from: 0
+                                    to: 1
+                                    duration: Appearance.anim.durations.large
+                                    easing.bezierCurve: Appearance.anim.curves.standardDecel
+                                }
                             }
-                            Anim {
-                                from: 0
-                                to: 1
-                                duration: Appearance.anim.durations.large
-                                easing.bezierCurve: Appearance.anim.curves.standardDecel
-                            }
+                        }
+
+                        StyledText {
+                            Layout.alignment: Qt.AlignHCenter
+                            visible: deviceContainer.device?.batteryAvailable ?? false
+                            text: `${Math.round((deviceContainer.device?.battery ?? 0) * 100)}%`
+                            color: root.colour
+                            font.pointSize: Appearance.font.size.smaller * 0.75
+                            font.family: Appearance.font.family.mono
                         }
                     }
                 }
@@ -223,28 +240,44 @@ StyledRect {
             name: "battery"
             active: Config.bar.status.showBattery
 
-            sourceComponent: MaterialIcon {
-                animate: true
-                text: {
-                    if (!UPower.displayDevice.isLaptopBattery) {
-                        if (PowerProfiles.profile === PowerProfile.PowerSaver)
-                            return "energy_savings_leaf";
-                        if (PowerProfiles.profile === PowerProfile.Performance)
-                            return "rocket_launch";
-                        return "balance";
-                    }
+            sourceComponent: ColumnLayout {
+                spacing: 0
 
-                    const perc = UPower.displayDevice.percentage;
-                    const charging = [UPowerDeviceState.Charging, UPowerDeviceState.FullyCharged, UPowerDeviceState.PendingCharge].includes(UPower.displayDevice.state);
-                    if (perc === 1)
-                        return charging ? "battery_charging_full" : "battery_full";
-                    let level = Math.floor(perc * 7);
-                    if (charging && (level === 4 || level === 1))
-                        level--;
-                    return charging ? `battery_charging_${(level + 3) * 10}` : `battery_${level}_bar`;
+                MaterialIcon {
+                    id: batteryIcon
+
+                    Layout.alignment: Qt.AlignHCenter
+                    animate: true
+                    text: {
+                        if (!UPower.displayDevice.isLaptopBattery) {
+                            if (PowerProfiles.profile === PowerProfile.PowerSaver)
+                                return "energy_savings_leaf";
+                            if (PowerProfiles.profile === PowerProfile.Performance)
+                                return "rocket_launch";
+                            return "balance";
+                        }
+
+                        const perc = UPower.displayDevice.percentage;
+                        const charging = [UPowerDeviceState.Charging, UPowerDeviceState.FullyCharged, UPowerDeviceState.PendingCharge].includes(UPower.displayDevice.state);
+                        if (perc === 1)
+                            return charging ? "battery_charging_full" : "battery_full";
+                        let level = Math.floor(perc * 7);
+                        if (charging && (level === 4 || level === 1))
+                            level--;
+                        return charging ? `battery_charging_${(level + 3) * 10}` : `battery_${level}_bar`;
+                    }
+                    color: !UPower.onBattery || UPower.displayDevice.percentage > 0.2 ? root.colour : Colours.palette.m3error
+                    fill: 1
                 }
-                color: !UPower.onBattery || UPower.displayDevice.percentage > 0.2 ? root.colour : Colours.palette.m3error
-                fill: 1
+
+                StyledText {
+                    Layout.alignment: Qt.AlignHCenter
+                    visible: UPower.displayDevice.isLaptopBattery
+                    text: `${Math.round(UPower.displayDevice.percentage * 100)}%`
+                    color: !UPower.onBattery || UPower.displayDevice.percentage > 0.2 ? root.colour : Colours.palette.m3error
+                    font.pointSize: Appearance.font.size.smaller * 0.75
+                    font.family: Appearance.font.family.mono
+                }
             }
         }
     }
