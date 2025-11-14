@@ -65,6 +65,11 @@ Item {
             sourceComponent: LockStatus {}
         }
 
+        Popout {
+            name: "calendar"
+            sourceComponent: Calendar {}
+        }
+
         Repeater {
             model: ScriptModel {
                 values: [...SystemTray.items.values]
