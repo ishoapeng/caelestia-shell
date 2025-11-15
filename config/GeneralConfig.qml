@@ -24,10 +24,6 @@ JsonObject {
                 timeout: 300,
                 idleAction: "dpms off",
                 returnAction: "dpms on"
-            },
-            {
-                timeout: 600,
-                idleAction: ["systemctl", "suspend-then-hibernate"]
             }
         ]
     }
