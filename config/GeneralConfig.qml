@@ -16,15 +16,11 @@ JsonObject {
         property bool lockBeforeSleep: true
         property bool inhibitWhenAudio: true
         property list<var> timeouts: [
-            {
-                timeout: 180,
-                idleAction: "lock"
-            },
-            {
-                timeout: 300,
-                idleAction: "dpms off",
-                returnAction: "dpms on"
-            }
+            // {
+            //     timeout: 300,
+            //     idleAction: "dpms off",
+            //     returnAction: "dpms on"
+            // }
         ]
     }
 
